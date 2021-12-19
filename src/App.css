@@ -1,0 +1,110 @@
+#show-only-boss-icons button {
+  font-size: 18px;
+  padding: 4px 8px 4px 8px;
+}
+
+ul {
+  padding-inline-start: 20px;
+  color: white;
+}
+
+span {
+  color: white;
+  font-size: 18px;
+}
+
+#checklist {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+}
+
+#checklist > div {
+  margin-bottom: 16px;
+}
+
+#boss-icons {
+  position: relative;
+}
+
+.boss-icon-wrapper {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.boss-icon-img {
+  image-rendering: pixelated;
+}
+
+.boss-undefeated {
+  filter: grayscale(80%) brightness(30%);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+#settings {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+#settings span {
+  white-space: nowrap;
+}
+
+#settings > div {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#settings select {
+  width: 70%;
+  height: 30px;
+}
+
+#settings input {
+  height: 30px;
+  box-sizing: border-box;
+}
+
+#settings input[type=checkbox] {
+  width: 30px;
+  margin: 0 0 0 12px;
+}
+
+#settings-bgcolor input,
+#settings-grid-type select {
+  width: 120px;
+}
+
+#settings input[type=range] {
+  margin-left: 12px;
+  margin-right: 12px;
+  width: 100%;
+}
+
+#settings-scale input[type=number],
+#settings-grid-unit-size input[type=number] {
+  max-width: 5em;
+}
+
+#settings-bgcolor-input {
+  margin-left: 12px;
+}
+
+#settings-hook-file-path input {
+  margin-left: 8px;
+  line-height: 36px;
+  height: 36px;
+}
+
+#settings-hook-file-path input::-webkit-file-upload-button {
+  height: 36px;
+}
