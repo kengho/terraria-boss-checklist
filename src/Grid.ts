@@ -1,6 +1,6 @@
 import { BossName } from './Bosses'
 
-type GridType = 'hexV' | 'hexH' | 'square' | 'linearH' | 'linearV'
+type GridType = 'hexV' | 'hexH' | 'square' | 'linearH' | 'linearV' | 'liveSplit1'
 type Coordinates = {
   x: number;
   y: number;
@@ -52,6 +52,7 @@ const getGridCoordinates = (
     case 'square':
     case 'linearH':
     case 'linearV':
+    case 'liveSplit1':
       coordinates.x = 0 + i * gridUnitSize
       coordinates.y = 0 + j * gridUnitSize
       break
@@ -365,8 +366,7 @@ const grids: Grids = {
     }, {
       bossName: 'plantera',
       i: 10, j: 0,
-    },
-    {
+    }, {
       bossName: 'golem',
       i: 11, j: 0,
     }, {
@@ -384,6 +384,61 @@ const grids: Grids = {
     }, {
       bossName: 'eol',
       i: 16, j: 0,
+    },
+  ],
+
+  'liveSplit1': [
+    {
+      bossName: 'skeletron',
+      i: 0, j: 5,
+    },{
+      bossName: 'wof',
+      i: 0, j: 6,
+    }, {
+      bossName: 'destroyer',
+      i: 0, j: 7,
+    }, {
+      bossName: 'twins',
+      i: 0, j: 8,
+    }, {
+      bossName: 'prime',
+      i: 1, j: 8,
+    }, {
+      bossName: 'plantera',
+      i: 0, j: 9,
+    }, {
+      bossName: 'golem',
+      i: 0, j: 10,
+    }, {
+      bossName: 'cultist',
+      i: 0, j: 11,
+    }, {
+      bossName: 'ml',
+      i: 0, j: 12,
+    }, {
+      bossName: 'ks',
+      i: 0, j: 13,
+    }, {
+      bossName: 'eoc',
+      i: 1, j: 13,
+    }, {
+      bossName: 'evil',
+      i: 2, j: 13,
+    }, {
+      bossName: 'qb',
+      i: 3, j: 13,
+    }, {
+      bossName: 'dc',
+      i: 4, j: 13,
+    }, {
+      bossName: 'qs',
+      i: 5, j: 13,
+    }, {
+      bossName: 'fishron',
+      i: 6, j: 13,
+    }, {
+      bossName: 'eol',
+      i: 7, j: 13,
     },
   ],
 }

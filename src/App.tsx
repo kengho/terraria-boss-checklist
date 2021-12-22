@@ -225,6 +225,7 @@ function App() {
           <option value="square">square</option>
           <option value="linearV">linear (vertical)</option>
           <option value="linearH">linear (horizontal)</option>
+          <option value="liveSplit1">LiveSplit 1</option>
         </select>
       </div>
       <div id="settings-hook-file-path">
