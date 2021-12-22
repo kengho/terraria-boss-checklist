@@ -179,6 +179,7 @@ function App() {
           <span>show only pre-hardmode bosses:</span>
         </label>
         <input
+          id="settings-aphb-checkbox"
           type="checkbox"
           defaultChecked={aphb}
           onChange={handleAphbClick}
