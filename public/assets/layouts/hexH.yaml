@@ -1,0 +1,56 @@
+alias: hex horizontal
+type: hexH
+scale: 1.5
+gridUnitSize: 40
+bosses:
+- bossName: dc
+  i: 1
+  j: 0
+- bossName: ks
+  i: 2
+  j: 0
+- bossName: qs
+  i: 3
+  j: 0
+- bossName: eol
+  i: 4
+  j: 0
+- bossName: evil
+  i: 0
+  j: 1
+- bossName: eoc
+  i: 1
+  j: 1
+- bossName: qb
+  i: 2
+  j: 1
+- bossName: fishron
+  i: 3
+  j: 1
+- bossName: skeletron
+  i: 1
+  j: 2
+- bossName: wof
+  i: 2
+  j: 2
+- bossName: plantera
+  i: 3
+  j: 2
+- bossName: cultist
+  i: 4
+  j: 2
+- bossName: destroyer
+  i: 0
+  j: 3
+- bossName: twins
+  i: 1
+  j: 3
+- bossName: prime
+  i: 2
+  j: 3
+- bossName: golem
+  i: 3
+  j: 3
+- bossName: ml
+  i: 4
+  j: 3

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import produce from 'immer'
+import YAML from 'yaml'
 
 import './App.css'
 import { BossProps, Layout, Layouts, getGridCoordinates } from './Layouts'
@@ -88,6 +89,9 @@ function App() {
       } catch (err) {
         return
       }
+      fileNames = fileNames.filter(fileName => {
+        return path.extname(fileName).toLowerCase() === '.yaml';
+      })
       if (fileNames.length === 0) {
         return
       }
@@ -102,7 +106,7 @@ function App() {
         }
 
         // TODO: handle errors, enforce data check.
-        const layout: Layout = JSON.parse(data)
+        const layout: Layout = YAML.parse(data)
         const id: string = path.parse(fileName).name
         layoutsInitialState[id] = layout
       }
@@ -110,6 +114,7 @@ function App() {
       setLayouts(layoutsInitialState)
 
       // NOTE: test case: create layout file, select it, rename file => currentLayout === undefined.
+      // REVIEW: this fails if there's no hexV layout in the folder for some reason, need fix?
       if (!layoutsInitialState[currentLayoutId]) {
         setCurrentLayoutId(defaultCurrentLayoutId)
       }

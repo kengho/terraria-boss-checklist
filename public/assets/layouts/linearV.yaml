@@ -1,0 +1,56 @@
+alias: linear vertical
+type: square
+scale: 1
+gridUnitSize: 35
+bosses:
+- bossName: ks
+  i: 0
+  j: 0
+- bossName: eoc
+  i: 0
+  j: 1
+- bossName: evil
+  i: 0
+  j: 2
+- bossName: qb
+  i: 0
+  j: 3
+- bossName: dc
+  i: 0
+  j: 4
+- bossName: skeletron
+  i: 0
+  j: 5
+- bossName: wof
+  i: 0
+  j: 6
+- bossName: destroyer
+  i: 0
+  j: 7
+- bossName: twins
+  i: 0
+  j: 8
+- bossName: prime
+  i: 0
+  j: 9
+- bossName: plantera
+  i: 0
+  j: 10
+- bossName: golem
+  i: 0
+  j: 11
+- bossName: cultist
+  i: 0
+  j: 12
+- bossName: ml
+  i: 0
+  j: 13
+- bossName: qs
+  i: 0
+  j: 14
+- bossName: fishron
+  i: 0
+  j: 15
+- bossName: eol
+  i: 0
+  j: 16

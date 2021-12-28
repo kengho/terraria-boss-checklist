@@ -1,0 +1,56 @@
+alias: LiveSplit all bosses 1
+type: square
+scale: 1
+gridUnitSize: 35
+bosses:
+- bossName: wof
+  i: 0
+  j: 6
+- bossName: destroyer
+  i: 0
+  j: 7
+- bossName: twins
+  i: 0
+  j: 8
+- bossName: prime
+  i: 1
+  j: 8
+- bossName: plantera
+  i: 0
+  j: 9
+- bossName: golem
+  i: 0
+  j: 10
+- bossName: cultist
+  i: 0
+  j: 11
+- bossName: skeletron
+  i: 1
+  j: 11
+- bossName: ml
+  i: 0
+  j: 12
+- bossName: ks
+  i: 0
+  j: 13
+- bossName: eoc
+  i: 1
+  j: 13
+- bossName: evil
+  i: 2
+  j: 13
+- bossName: qb
+  i: 3
+  j: 13
+- bossName: dc
+  i: 4
+  j: 13
+- bossName: qs
+  i: 5
+  j: 13
+- bossName: fishron
+  i: 6
+  j: 13
+- bossName: eol
+  i: 7
+  j: 13
