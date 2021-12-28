@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import produce from 'immer'
 
 import './App.css'
-import { grids, GridType, getGridCoordinates } from './Grid'
+import { BossProps, Layout, Layouts, getGridCoordinates } from './Layouts'
 import { bossNames, BossName, Bosses } from './Bosses'
 import initAutosplitterHook from './AutosplitterHook'
 import { version, description } from './../package.json'
@@ -45,12 +45,14 @@ function App() {
   const defaultScale = 1.5
   const [scale, setScale] = useState<number>(store.get('scale') || defaultScale)
   const [keyColorHex, setKeyColorHex] = useState<string>(store.get('keyColorHex') || '#222222')
-  const [gridType, setGridType] = useState<GridType>(store.get('gridType') || 'hexV')
   const [gridMinX, setGridMinX] = useState<number>(0)
   const [gridMinY, setGridMinY] = useState<number>(0)
   const defaultGridUnitSize = 40
   const [gridUnitSize, setGridUnitSize] = useState<number>(store.get('gridUnitSize') || defaultGridUnitSize)
   const [autosplitterHookFilePath, setAutosplitterHookFilePath] = useState<string>(store.get('autosplitterHookFilePath') || '')
+  const [layouts, setLayouts] = useState<Layouts>({})
+  const defaultCurrentLayoutId = 'hexV'
+  const [currentLayoutId, setCurrentLayoutId] = useState<string>(store.get('currentLayoutId') || defaultCurrentLayoutId)
 
   // side effects
   useEffect(() => {
@@ -64,10 +66,52 @@ function App() {
     store.set('scale', scale)
     store.set('showOnlyBossIcons', showOnlyBossIcons)
     store.set('keyColorHex', keyColorHex)
-    store.set('gridType', gridType)
+    store.set('currentLayoutId', currentLayoutId)
     store.set('gridUnitSize', gridUnitSize)
     store.set('autosplitterHookFilePath', autosplitterHookFilePath)
-  }, [bosses, aphb, scale, showOnlyBossIcons, keyColorHex, gridType, gridUnitSize, autosplitterHookFilePath])
+  }, [bosses, aphb, scale, showOnlyBossIcons, keyColorHex, currentLayoutId, gridUnitSize, autosplitterHookFilePath])
+
+  useEffect(() => {
+    const layoutsDir = './public/layouts'
+
+    async function initializeLayouts() {
+      const fs = require('fs')
+      let fileNames: Array<string>
+      try {
+        fileNames = await fs.promises.readdir(layoutsDir)
+      } catch (err) {
+        return
+      }
+      if (fileNames.length === 0) {
+        return
+      }
+
+      let layoutsInitialState: Layouts = {}
+      for (const fileName of fileNames) {
+        let data: string
+        try {
+          data  = await fs.promises.readFile(`${layoutsDir}/${fileName}`, 'utf-8')
+        } catch (err) {
+          return
+        }
+
+        // TODO: handle errors, enforce data check.
+        const layout: Layout = JSON.parse(data)
+        const path = require('path')
+        const id: string = path.parse(fileName).name
+        layoutsInitialState[id] = layout
+      }
+
+      setLayouts(layoutsInitialState)
+
+      // NOTE: test case: create layout file, select it, rename file => currentLayout === undefined.
+      if (!layoutsInitialState[currentLayoutId]) {
+        setCurrentLayoutId(defaultCurrentLayoutId)
+      }
+    }
+
+    initializeLayouts()
+  }, [])
 
   useEffect(() => {
     initAutosplitterHook(autosplitterHookFilePath, setBosses)
@@ -79,8 +123,19 @@ function App() {
 
   useEffect(() => {
     let tmpX = Infinity, tmpY = Infinity
-    grids[gridType].forEach(bossProps => {
-      const { x, y } = getGridCoordinates({ gridType, i: bossProps.i, j: bossProps.j, gridUnitSize })
+
+    const layout = layouts[currentLayoutId]
+    if (!layout) {
+      return
+    }
+
+    layouts[currentLayoutId].bosses.forEach((bossProps: BossProps) => {
+      const { x, y } = getGridCoordinates({
+        layoutType: layouts[currentLayoutId].type,
+        i: bossProps.i,
+        j: bossProps.j,
+        gridUnitSize,
+      })
       if (x < tmpX) {
         tmpX = x
       }
@@ -90,7 +145,17 @@ function App() {
     })
     setGridMinX(tmpX)
     setGridMinY(tmpY)
-  }, [gridType, gridUnitSize])
+  }, [layouts, currentLayoutId, gridUnitSize])
+
+  useEffect(() => {
+    const currentLayout = layouts[currentLayoutId]
+    if (currentLayout && currentLayout.scale) {
+      setScale(currentLayout.scale)
+    }
+    if (currentLayout && currentLayout.gridUnitSize) {
+      setGridUnitSize(currentLayout.gridUnitSize)
+    }
+  }, [layouts, currentLayoutId])
 
   // event handlers
   const handleShowOnlyBossIconsClick = (): void => {
@@ -126,9 +191,9 @@ function App() {
     setKeyColorHex(elem.value)
   }
 
-  const handleChangeGridType = (evt: React.SyntheticEvent<EventTarget>): void => {
+  const handleChangecurrentLayoutId = (evt: React.SyntheticEvent<EventTarget>): void => {
     const elem = evt.target as HTMLInputElement
-    setGridType(elem.value as GridType)
+    setCurrentLayoutId(elem.value as string)
   }
 
   const handleBossIconLeftClick = (bossName: BossName): void => {
@@ -161,6 +226,7 @@ function App() {
   }
 
   // main html
+  const currentLayout = layouts[currentLayoutId]
   return <div id="checklist">
     <div id="show-only-boss-icons">
       <button onClick={handleShowOnlyBossIconsClick}>
@@ -214,20 +280,20 @@ function App() {
           value={keyColorHex}
         />
       </div>
-      <div id="settings-grid-type">
-        <span>layout:</span>
-        <select
-          defaultValue={gridType}
-          onChange={handleChangeGridType}
-        >
-          <option value="hexV">hex 1</option>
-          <option value="hexH"> hex 2</option>
-          <option value="square">square</option>
-          <option value="linearV">linear (vertical)</option>
-          <option value="linearH">linear (horizontal)</option>
-          <option value="liveSplit1">LiveSplit 1</option>
-        </select>
-      </div>
+      {currentLayout &&
+        <div id="settings-grid-type">
+          <span>layout:</span>
+          <select
+            key={`settings-layouts-select-${currentLayoutId}`}
+            defaultValue={currentLayoutId}
+            onChange={handleChangecurrentLayoutId}
+          >
+          {Object.keys(layouts).map((id) =>
+            <option key={`settings-layouts-option-${id}`} value={id}>{layouts[id].alias}</option>
+          )}
+          </select>
+        </div>
+      }
       <div id="settings-hook-file-path">
         <span>autosplitter hook file:</span>
         <input type="file" onChange={handleChangeHookFilePath} />
@@ -242,7 +308,7 @@ function App() {
         left: `${-gridMinX + gridUnitSize}px`,
       }}
     >
-      {grids[gridType].map((bossProps) => {
+      {currentLayout && currentLayout.bosses.map((bossProps: BossProps) => {
         if (aphb && bosses[bossProps.bossName].hardmodeExclusive) {
           return false
         }
@@ -269,7 +335,12 @@ function App() {
           iconClassNames.push('pointer')
         }
 
-        const { x, y } = getGridCoordinates({ gridType, i: bossProps.i, j: bossProps.j, gridUnitSize })
+        const { x, y } = getGridCoordinates({
+          layoutType: currentLayout.type,
+          i: bossProps.i,
+          j: bossProps.j,
+          gridUnitSize,
+        })
         return <div
           key={`${bossProps.bossName}-wrapper`}
           className="boss-icon-wrapper"

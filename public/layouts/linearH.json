@@ -1,0 +1,60 @@
+{
+  "alias": "linear horizontal",
+  "type": "square",
+  "scale": 1,
+  "gridUnitSize": 35,
+  "bosses": [
+    {
+      "bossName": "ks",
+      "i": 0, "j": 0
+    }, {
+      "bossName": "eoc",
+      "i": 1, "j": 0
+    }, {
+      "bossName": "evil",
+      "i": 2, "j": 0
+    }, {
+      "bossName": "qb",
+      "i": 3, "j": 0
+    }, {
+      "bossName": "dc",
+      "i": 4, "j": 0
+    }, {
+      "bossName": "skeletron",
+      "i": 5, "j": 0
+    }, {
+      "bossName": "wof",
+      "i": 6, "j": 0
+    }, {
+      "bossName": "destroyer",
+      "i": 7, "j": 0
+    }, {
+      "bossName": "twins",
+      "i": 8, "j": 0
+    }, {
+      "bossName": "prime",
+      "i": 9, "j": 0
+    }, {
+      "bossName": "plantera",
+      "i": 10, "j": 0
+    }, {
+      "bossName": "golem",
+      "i": 11, "j": 0
+    }, {
+      "bossName": "cultist",
+      "i": 12, "j": 0
+    }, {
+      "bossName": "ml",
+      "i": 13, "j": 0
+    }, {
+      "bossName": "qs",
+      "i": 14, "j": 0
+    }, {
+      "bossName": "fishron",
+      "i": 15, "j": 0
+    }, {
+      "bossName": "eol",
+      "i": 16, "j": 0
+    }
+  ]
+}
