@@ -281,13 +281,9 @@ function App() {
   }
 
   const handleBossIconLeftClick = (bossName: string): void => {
-    setBosses(produce(draft => {
-      // REVIEW
-      if (!draft) {
-        return
-      }
-
-      draft[bossName].defeated = !draft[bossName].defeated
+    setBosses(produce(bosses, draft => {
+      // NOTE: at this point I'm sure draft (aka proxy dor bosses) is defined.
+      draft![bossName].defeated = !(draft![bossName].defeated)
     }))
   }
 
@@ -299,13 +295,8 @@ function App() {
         nextIconVariant = 0
       }
 
-      setBosses(produce(draft => {
-        // REVIEW
-        if (!draft) {
-          return
-        }
-
-        draft[bossName].currentIconVariant = nextIconVariant
+      setBosses(produce(bosses, draft => {
+        draft![bossName].currentIconVariant = nextIconVariant
       }))
     }
   }
@@ -330,7 +321,7 @@ function App() {
         const { getCurrentWindow } = require('@electron/remote')
         getCurrentWindow().reload()
       }}>
-        reset user settings and reload page
+        reset settings and reload app
       </button>
     </div>
     <div id="tips" style={{ display: showOnlyBossIcons ? 'none' : 'block' }}>
