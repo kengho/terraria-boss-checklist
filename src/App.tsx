@@ -13,30 +13,37 @@ const store = new Store('uiState.json')
 
 function App() {
   // state
+  const defaultCurrentLayoutId = 'hexV'
+  const [currentLayoutId, setCurrentLayoutId] = useState<string>(store.get('currentLayoutId') || defaultCurrentLayoutId)
   const [bosses, setBosses] = useState<Bosses>()
   const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(store.get('showOnlyBossIcons') || false)
   const [aphb, setAphb] = useState<boolean>(store.get('aphb') || false)
   const defaultScale = 1.5
-  const [scale, setScale] = useState<number>(store.get('scale') || defaultScale)
+  const layoutsOverrideForScale = store.get('layoutsOverrides')[currentLayoutId]?.scale
+  const [scale, setScale] = useState<number>(layoutsOverrideForScale || defaultScale)
   const [keyColorHex, setKeyColorHex] = useState<string>(store.get('keyColorHex') || '#222222')
   const [gridMinX, setGridMinX] = useState<number>(0)
   const [gridMinY, setGridMinY] = useState<number>(0)
   const defaultGridUnitSize = 40
-  const [gridUnitSize, setGridUnitSize] = useState<number>(store.get('gridUnitSize') || defaultGridUnitSize)
+  const layoutsOverrideForGridUnitSize = store.get('layoutsOverrides')[currentLayoutId]?.gridUnitSize
+  const [gridUnitSize, setGridUnitSize] = useState<number>(layoutsOverrideForGridUnitSize || defaultGridUnitSize)
   const [autosplitterHookFilePath, setAutosplitterHookFilePath] = useState<string>(store.get('autosplitterHookFilePath') || '')
   const [layouts, setLayouts] = useState<Layouts>({})
-  const defaultCurrentLayoutId = 'hexV'
-  const [currentLayoutId, setCurrentLayoutId] = useState<string>(store.get('currentLayoutId') || defaultCurrentLayoutId)
 
   // side effects
+  // TODO: clear uiState button
   useEffect(() => {
-    let iconVariants: { [key: string]: number } = {}
+    // NOTE: using immerjs for nested objects here and below so simpleStore could easilly compare old value and new one.
     if (bosses) {
+      let iconVariants: { [key: string]: number } = store.get('iconVariants')
+      if (!iconVariants) {
+        iconVariants = {}
+      }
       const bossList: Array<string> = Object.keys(bosses)
       bossList.forEach((bossName) => {
         const boss = bosses[bossName]
         if (boss.iconPaths.length > 1) {
-          iconVariants[bossName] = boss.currentIconVariant
+          iconVariants = produce(iconVariants, draft => { draft[bossName] = boss.currentIconVariant })
         }
       })
       store.set('iconVariants', iconVariants)
@@ -44,13 +51,31 @@ function App() {
 
     // TODO: aphb hardcoded into layouts for now, fix.
     store.set('aphb', aphb)
-    store.set('scale', scale)
     store.set('showOnlyBossIcons', showOnlyBossIcons)
     store.set('keyColorHex', keyColorHex)
     store.set('currentLayoutId', currentLayoutId)
-    store.set('gridUnitSize', gridUnitSize)
     store.set('autosplitterHookFilePath', autosplitterHookFilePath)
-  }, [bosses, aphb, scale, showOnlyBossIcons, keyColorHex, currentLayoutId, gridUnitSize, autosplitterHookFilePath])
+  }, [bosses, aphb, showOnlyBossIcons, keyColorHex, currentLayoutId, autosplitterHookFilePath])
+
+  // saving scale and gridUnitSize separate from other props because otherwise
+  //   changing currentLayoutId triggers saving wrong data to the store
+  useEffect(() => {
+    let layoutsOverrides: { [key: string]: { scale?: number, gridUnitSize?: number }} = store.get('layoutsOverrides')
+    if (!layoutsOverrides) {
+      layoutsOverrides = {}
+    }
+    if (!layoutsOverrides[currentLayoutId]) {
+      layoutsOverrides = produce(layoutsOverrides, draft => { draft[currentLayoutId] = {}})
+    }
+    layoutsOverrides = produce(layoutsOverrides, draft => {
+      draft[currentLayoutId].scale = scale
+      draft[currentLayoutId].gridUnitSize = gridUnitSize
+    })
+    store.set('layoutsOverrides', layoutsOverrides)
+
+    // should not trigger saving scale and such to the store if currentLayoutId changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scale, gridUnitSize])
 
   useEffect(() => {
     const layoutsDir = './public/assets/layouts'
@@ -92,6 +117,9 @@ function App() {
     }
 
     initializeLayouts()
+
+    // should run once, don't need to check whether currentLayoutId changed or not
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -194,12 +222,21 @@ function App() {
     setGridMinY(tmpY)
   }, [layouts, currentLayoutId, gridUnitSize])
 
+  // use layouts' scale and gridUnitSize unless it there are overrides in uiState
   useEffect(() => {
     const currentLayout = layouts[currentLayoutId]
-    if (currentLayout && currentLayout.scale) {
+
+    const layoutsOverrideForScale = store.get('layoutsOverrides')[currentLayoutId]?.scale
+    if (layoutsOverrideForScale) {
+      setScale(layoutsOverrideForScale)
+    } else if (currentLayout && currentLayout.scale) {
       setScale(currentLayout.scale)
     }
-    if (currentLayout && currentLayout.gridUnitSize) {
+
+    const layoutsOverrideForGridUnitSize = store.get('layoutsOverrides')[currentLayoutId]?.gridUnitSize
+    if (layoutsOverrideForGridUnitSize) {
+      setGridUnitSize(layoutsOverrideForGridUnitSize)
+    } else if (currentLayout && currentLayout.gridUnitSize) {
       setGridUnitSize(currentLayout.gridUnitSize)
     }
   }, [layouts, currentLayoutId])
