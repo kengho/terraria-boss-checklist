@@ -72,7 +72,7 @@ function App() {
       for (const fileName of fileNames) {
         let data: string
         try {
-          data  = await fs.promises.readFile(`${layoutsDir}/${fileName}`, 'utf-8')
+          data  = await fs.promises.readFile(path.join(layoutsDir, fileName), 'utf-8')
         } catch (err) {
           return
         }
@@ -133,8 +133,7 @@ function App() {
           bossesInitialState[bossName] = boss
         }
 
-        // TODO: use some fs path lib method for this and also for layouts.
-        const fullIconPath = `${bossIconsRenderDir}/${fileName}`
+        const fullIconPath = path.join(bossIconsRenderDir, fileName)
 
         // NOTE: I'm sure it's defined.
         bossesInitialState[bossName]!.iconPaths.push(fullIconPath)
