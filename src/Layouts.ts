@@ -1,8 +1,6 @@
-import { BossName } from './Bosses'
-
 type LayoutType = 'hexV' | 'hexH' | 'square'
 type BossProps = {
-  bossName: BossName;
+  bossName: string;
   i: number;
   j: number;
 }

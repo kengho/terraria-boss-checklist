@@ -3,7 +3,7 @@ import produce from 'immer'
 
 import './App.css'
 import { BossProps, Layout, Layouts, getGridCoordinates } from './Layouts'
-import { bossNames, BossName, Bosses } from './Bosses'
+import { Boss, Bosses } from './Bosses'
 import initAutosplitterHook from './AutosplitterHook'
 import { version, description } from './../package.json'
 
@@ -13,33 +13,7 @@ const store = new Store('uiState.json')
 
 function App() {
   // state
-  // REVIEW: : maybe scan the images before starting the app?
-  //   This way we won't need boss names and icon variants hardcoded.
-  const bossesInitialState: any = {}
-  bossNames.forEach(bossName =>
-    bossesInitialState[bossName] = {
-      defeated: false,
-      hardmodeExclusive: true,
-    }
-  )
-  const aphbList: Array<BossName> = ['ks', 'eoc', 'evil', 'qb', 'skeletron', 'dc', 'wof']
-  aphbList.forEach(bossName => {
-    bossesInitialState[bossName].hardmodeExclusive = false
-  })
-
-  bossesInitialState.eoc.iconVariantsNumber = 2
-
-  // NOTE: I do realize that this only works because default value is 0.
-  bossesInitialState.eoc.currentIconVariant = store.get('eocIconVariant') || 0
-  bossesInitialState.evil.iconVariantsNumber = 3
-  bossesInitialState.evil.currentIconVariant = store.get('evilIconVariant') || 0
-  bossesInitialState.dc.iconVariantsNumber = 2
-  bossesInitialState.dc.currentIconVariant = store.get('dcIconVariant') || 0
-  bossesInitialState.twins.iconVariantsNumber = 6
-  bossesInitialState.twins.currentIconVariant = store.get('twinsIconVariant') || 0
-  bossesInitialState.plantera.iconVariantsNumber = 2
-  bossesInitialState.plantera.currentIconVariant = store.get('planteraIconVariant') || 0
-  const [bosses, setBosses] = useState<Bosses>(bossesInitialState)
+  const [bosses, setBosses] = useState<Bosses>()
   const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(store.get('showOnlyBossIcons') || false)
   const [aphb, setAphb] = useState<boolean>(store.get('aphb') || false)
   const defaultScale = 1.5
@@ -56,12 +30,19 @@ function App() {
 
   // side effects
   useEffect(() => {
-    store.set('eocIconVariant', bosses.eoc.currentIconVariant)
-    store.set('evilIconVariant', bosses.evil.currentIconVariant)
-    store.set('dcIconVariant', bosses.dc.currentIconVariant)
-    store.set('twinsIconVariant', bosses.twins.currentIconVariant)
-    store.set('planteraIconVariant', bosses.plantera.currentIconVariant)
+    let iconVariants: { [key: string]: number } = {}
+    if (bosses) {
+      const bossList: Array<string> = Object.keys(bosses)
+      bossList.forEach((bossName) => {
+        const boss = bosses[bossName]
+        if (boss.iconPaths.length > 1) {
+          iconVariants[bossName] = boss.currentIconVariant
+        }
+      })
+      store.set('iconVariants', iconVariants)
+    }
 
+    // TODO: aphb hardcoded into layouts for now, fix.
     store.set('aphb', aphb)
     store.set('scale', scale)
     store.set('showOnlyBossIcons', showOnlyBossIcons)
@@ -76,6 +57,7 @@ function App() {
 
     async function initializeLayouts() {
       const fs = require('fs')
+      const path = require('path')
       let fileNames: Array<string>
       try {
         fileNames = await fs.promises.readdir(layoutsDir)
@@ -97,7 +79,6 @@ function App() {
 
         // TODO: handle errors, enforce data check.
         const layout: Layout = JSON.parse(data)
-        const path = require('path')
         const id: string = path.parse(fileName).name
         layoutsInitialState[id] = layout
       }
@@ -111,6 +92,73 @@ function App() {
     }
 
     initializeLayouts()
+  }, [])
+
+  useEffect(() => {
+    // TODO: move layouts to assets?
+    const bossIconsDir = './public/assets/boss-icons'
+
+    // NOTE: images rendering with "public" as root.
+    const bossIconsRenderDir = './assets/boss-icons'
+
+    async function initializeBosses() {
+      const fs = require('fs')
+      const path = require('path')
+      let fileNames: Array<string>
+      try {
+        fileNames = await fs.promises.readdir(bossIconsDir)
+      } catch (err) {
+        return
+      }
+      if (fileNames.length === 0) {
+        return
+      }
+
+      let bossesInitialState: any = {}
+      fileNames.forEach(fileName => {
+        const fileNameNoExt: string = path.parse(fileName).name
+        const match = fileNameNoExt.match(/^([^-]+)(-v.*)?$/)
+        if (!match) {
+          return
+        }
+
+        const bossName = match[1]
+        if (!bossesInitialState[bossName]) {
+          const boss: Boss = {
+            defeated: false,
+            hardmodeExclusive: true,
+            currentIconVariant: 0,
+            iconPaths: [],
+          }
+          bossesInitialState[bossName] = boss
+        }
+
+        // TODO: use some fs path lib method for this and also for layouts.
+        const fullIconPath = `${bossIconsRenderDir}/${fileName}`
+
+        // NOTE: I'm sure it's defined.
+        bossesInitialState[bossName]!.iconPaths.push(fullIconPath)
+      })
+
+      // TODO: let users est aphb flag somewhere somehow. Hardcoded phb for now.
+      const aphbList: Array<string> = ['ks', 'eoc', 'evil', 'qb', 'skeletron', 'dc', 'wof']
+      aphbList.forEach(bossName => {
+        if (bossesInitialState[bossName]) {
+          bossesInitialState[bossName].hardmodeExclusive = false
+        }
+      })
+
+      const storedIconVariants: { [key: string]: number } = store.get('iconVariants')
+      if (storedIconVariants) {
+        Object.keys(storedIconVariants).forEach(bossName => {
+          bossesInitialState[bossName].currentIconVariant = storedIconVariants[bossName]
+        })
+      }
+
+      setBosses(bossesInitialState)
+    }
+
+    initializeBosses()
   }, [])
 
   useEffect(() => {
@@ -196,24 +244,33 @@ function App() {
     setCurrentLayoutId(elem.value as string)
   }
 
-  const handleBossIconLeftClick = (bossName: BossName): void => {
-    setBosses(produce(draft => { draft[bossName].defeated = !draft[bossName].defeated }))
+  const handleBossIconLeftClick = (bossName: string): void => {
+    setBosses(produce(draft => {
+      // REVIEW
+      if (!draft) {
+        return
+      }
+
+      draft[bossName].defeated = !draft[bossName].defeated
+    }))
   }
 
-  const handleBossIconRightClick = (bossName: BossName): void => {
-    if (
-      typeof(bosses[bossName].iconVariantsNumber) === 'number' &&
-      typeof(bosses[bossName].currentIconVariant) === 'number'
-    ) {
-      // REWIEV: wtf is this? I specifically checked that both iconVariantsNumber and currentIconVariant
-      //   aren't undefined, yet TS error "Object is possibly 'undefined'.  TS2532"
-      //   kept popping up until I added bunch of exclamation marks below.
-      //   Maybe I'm stupid or something.
-      let nextIconVariant = bosses![bossName!].currentIconVariant! + 1!
-      if (nextIconVariant > bosses![bossName!].iconVariantsNumber! - 1) {
+  const handleBossIconRightClick = (bossName: string): void => {
+    const boss = bosses![bossName]
+    if (boss.iconPaths.length > 1) {
+      let nextIconVariant = boss.currentIconVariant + 1
+      if (nextIconVariant > boss.iconPaths.length - 1) {
         nextIconVariant = 0
       }
-      setBosses(produce(draft => { draft[bossName].currentIconVariant = nextIconVariant }))
+
+      setBosses(produce(draft => {
+        // REVIEW
+        if (!draft) {
+          return
+        }
+
+        draft[bossName].currentIconVariant = nextIconVariant
+      }))
     }
   }
 
@@ -308,27 +365,20 @@ function App() {
         left: `${-gridMinX + gridUnitSize}px`,
       }}
     >
-      {currentLayout && currentLayout.bosses.map((bossProps: BossProps) => {
-        if (aphb && bosses[bossProps.bossName].hardmodeExclusive) {
+      {currentLayout && currentLayout.bosses && currentLayout.bosses.map((bossProps: BossProps) => {
+        const boss = bosses![bossProps.bossName]
+        if (aphb && boss.hardmodeExclusive) {
           return false
         }
 
         let useIconVariants = false
-        if (
-          typeof(bosses[bossProps.bossName].iconVariantsNumber) === 'number' &&
-          typeof(bosses[bossProps.bossName].currentIconVariant) === 'number'
-        ) {
+        if (boss.iconPaths.length > 1) {
           useIconVariants = true
         }
 
-        let imgPath = `./assets/boss-icons/${bossProps.bossName}`
-         if (useIconVariants) {
-          imgPath += `-v${bosses[bossProps.bossName].currentIconVariant}`
-        }
-        imgPath += '.png'
-
+        const imgPath = boss.iconPaths[boss.currentIconVariant]
         const iconClassNames = ['boss-icon-img']
-        if (!bosses[bossProps.bossName].defeated) {
+        if (!boss.defeated) {
           iconClassNames.push('boss-undefeated')
         }
         if (useIconVariants) {

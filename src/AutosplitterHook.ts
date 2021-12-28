@@ -1,8 +1,8 @@
 import produce from 'immer'
 
-import { BossName, Bosses } from './Bosses'
+import { Bosses } from './Bosses'
 
-const bossNamesMapping: { [key: string]: BossName } = {
+const bossNamesMapping: { [key: string]: string } = {
   'WallofFlesh': 'wof',
   'EyeofCthulhu': 'eoc',
   'EaterofWorldsBrainofCthulhu': 'evil',
@@ -62,7 +62,7 @@ const readDataAndUpdateState = (autosplitterHookFilePath: string, setBosses: Fun
         }
         const autosplittersBossName: string = match[1]
         const autosplittersDefeated: string = match[2]
-        const bossName: BossName = bossNamesMapping[autosplittersBossName]
+        const bossName: string = bossNamesMapping[autosplittersBossName]
         const defeated: boolean = (autosplittersDefeated === 'True')
         draft[bossName].defeated = defeated
       })
