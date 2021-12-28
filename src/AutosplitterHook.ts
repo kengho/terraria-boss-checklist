@@ -64,7 +64,11 @@ const readDataAndUpdateState = (autosplitterHookFilePath: string, setBosses: Fun
         const autosplittersDefeated: string = match[2]
         const bossName: string = bossNamesMapping[autosplittersBossName]
         const defeated: boolean = (autosplittersDefeated === 'True')
-        draft[bossName].defeated = defeated
+
+        // is case there are user made custom bosses
+        if (draft[bossName]) {
+          draft[bossName].defeated = defeated
+        }
       })
     }))
   })
