@@ -86,7 +86,8 @@ span {
 }
 
 #settings-bgcolor input,
-#settings-grid-type select {
+#settings-grid-type select,
+#settings-hook-file-path label {
   width: 120px;
 }
 
@@ -105,12 +106,48 @@ span {
   margin-left: 12px;
 }
 
+/* https://stackoverflow.com/questions/572768/styling-an-input-type-file-button#comment91932951_25825731 */
 #settings-hook-file-path input {
-  margin-left: 8px;
-  line-height: 36px;
-  height: 36px;
+  /*
+  * visuallyHidden class copied from HTML5 Boilerplate project:
+  * https://github.com/h5bp/html5-boilerplate/blob/9d6176a26ca4b70ab64a51d7abb9d3ebaa197855/dist/css/main.css#L135
+  *
+  * More: http://hugogiraudel.com/2016/10/13/css-hide-and-seek
+  */
+
+  /*
+  * Hide only visually, but have it available for screen readers:
+  * https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+  *
+  * 1. For long content, line feeds are not interpreted as spaces and small width
+  *    causes content to wrap 1 word per line:
+  *    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
+  */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap; /* 1 */
+  clip-path: inset(50%);
+  border: 0;
 }
 
-#settings-hook-file-path input::-webkit-file-upload-button {
-  height: 36px;
+#settings-hook-file-path label {
+  /* color copied from other inputs */
+  border: 1px solid rgb(118, 118, 118);
+  display: inline-block;
+  cursor: pointer;
+  text-align: center;
+  height: 30px;
+
+  /* text looks centered that way */
+  line-height: 26px;
+  box-sizing: border-box;
+  background: white;
+}
+
+#settings-hook-file-path label:focus-within {
+  outline: -webkit-focus-ring-color auto 1px;
 }

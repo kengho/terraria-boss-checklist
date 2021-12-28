@@ -387,7 +387,10 @@ function App() {
       }
       <div id="settings-hook-file-path">
         <span>autosplitter hook file:</span>
-        <input type="file" onChange={handleChangeHookFilePath} />
+        <label>
+          <input type="file" onChange={handleChangeHookFilePath} />
+          select file
+        </label>
       </div>
     </div>
     <div
