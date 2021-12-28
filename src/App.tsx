@@ -53,7 +53,7 @@ function App() {
   }, [bosses, aphb, scale, showOnlyBossIcons, keyColorHex, currentLayoutId, gridUnitSize, autosplitterHookFilePath])
 
   useEffect(() => {
-    const layoutsDir = './public/layouts'
+    const layoutsDir = './public/assets/layouts'
 
     async function initializeLayouts() {
       const fs = require('fs')
