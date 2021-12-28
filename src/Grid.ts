@@ -389,9 +389,6 @@ const grids: Grids = {
 
   'liveSplit1': [
     {
-      bossName: 'skeletron',
-      i: 0, j: 5,
-    },{
       bossName: 'wof',
       i: 0, j: 6,
     }, {
@@ -412,6 +409,9 @@ const grids: Grids = {
     }, {
       bossName: 'cultist',
       i: 0, j: 11,
+    }, {
+      bossName: 'skeletron',
+      i: 1, j: 11,
     }, {
       bossName: 'ml',
       i: 0, j: 12,
