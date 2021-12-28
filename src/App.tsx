@@ -19,19 +19,18 @@ function App() {
   const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(store.get('showOnlyBossIcons') || false)
   const [aphb, setAphb] = useState<boolean>(store.get('aphb') || false)
   const defaultScale = 1.5
-  const layoutsOverrideForScale = store.get('layoutsOverrides')[currentLayoutId]?.scale
+  const layoutsOverrideForScale = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.scale
   const [scale, setScale] = useState<number>(layoutsOverrideForScale || defaultScale)
   const [keyColorHex, setKeyColorHex] = useState<string>(store.get('keyColorHex') || '#222222')
   const [gridMinX, setGridMinX] = useState<number>(0)
   const [gridMinY, setGridMinY] = useState<number>(0)
   const defaultGridUnitSize = 40
-  const layoutsOverrideForGridUnitSize = store.get('layoutsOverrides')[currentLayoutId]?.gridUnitSize
+  const layoutsOverrideForGridUnitSize = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.gridUnitSize
   const [gridUnitSize, setGridUnitSize] = useState<number>(layoutsOverrideForGridUnitSize || defaultGridUnitSize)
   const [autosplitterHookFilePath, setAutosplitterHookFilePath] = useState<string>(store.get('autosplitterHookFilePath') || '')
   const [layouts, setLayouts] = useState<Layouts>({})
 
   // side effects
-  // TODO: clear uiState button
   useEffect(() => {
     // NOTE: using immerjs for nested objects here and below so simpleStore could easilly compare old value and new one.
     if (bosses) {
@@ -242,6 +241,7 @@ function App() {
   }, [layouts, currentLayoutId])
 
   // event handlers
+  // REVIEW: should all handlers, even that simple, be outside of html?
   const handleShowOnlyBossIconsClick = (): void => {
     setShowOnlyBossIcons(!showOnlyBossIcons)
   }
@@ -321,9 +321,16 @@ function App() {
   // main html
   const currentLayout = layouts[currentLayoutId]
   return <div id="checklist">
-    <div id="show-only-boss-icons">
+    <div id="buttons">
       <button onClick={handleShowOnlyBossIconsClick}>
         {showOnlyBossIcons ? 'show settings' : 'hide settings'}
+      </button>
+      <button onClick={() => {
+        store.reset()
+        const { getCurrentWindow } = require('@electron/remote')
+        getCurrentWindow().reload()
+      }}>
+        reset user settings and reload page
       </button>
     </div>
     <div id="tips" style={{ display: showOnlyBossIcons ? 'none' : 'block' }}>

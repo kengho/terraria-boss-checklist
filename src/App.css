@@ -1,6 +1,12 @@
-#show-only-boss-icons button {
+#buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+#buttons button {
   font-size: 18px;
   padding: 4px 8px 4px 8px;
+  margin: 4px;
 }
 
 ul {

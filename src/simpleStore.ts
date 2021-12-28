@@ -18,6 +18,10 @@ class SimpleStore {
     this.currentState = JSON.parse(fs.readFileSync(this.storageFilePath, 'utf-8'))
   }
 
+  reset() {
+    fs.writeFileSync(this.storageFilePath, '{}')
+  }
+
   get(key: any): any {
     return this.currentState[key]
   }
@@ -25,7 +29,7 @@ class SimpleStore {
   set(key: any, value: any): void {
     if (this.currentState[key] !== value) {
       this.currentState[key] = value
-      fs.writeFileSync(this.storageFilePath, JSON.stringify(this.currentState, null, 4))
+      fs.writeFileSync(this.storageFilePath, JSON.stringify(this.currentState, null, 2))
     }
   }
 }

@@ -27,6 +27,7 @@
     }
   },
   "dependencies": {
+    "@electron/remote": "^2.0.1",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.12",
     "@types/react": "^17.0.37",

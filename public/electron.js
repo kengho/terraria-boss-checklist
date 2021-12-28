@@ -1,12 +1,11 @@
 const electron = require('electron')
-// const app = electron.app
-// const BrowserWindow = electron.BrowserWindow
 const { app, BrowserWindow } = electron
 
 const path = require('path')
 const isDev = require('electron-is-dev')
 
 const windowStateKeeper = require('electron-window-state')
+
 let mainWindow
 
 function createWindow() {
@@ -36,6 +35,9 @@ function createWindow() {
     mainWindow.webContents.openDevTools()
   }
   mainWindow.on('closed', () => { mainWindow = null })
+
+  require('@electron/remote/main').initialize()
+  require("@electron/remote/main").enable(mainWindow.webContents)
 }
 
 app.on('ready', createWindow)
