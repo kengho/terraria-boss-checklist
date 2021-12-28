@@ -127,17 +127,15 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const bossIconsDir = './public/assets/boss-icons'
-
-    // NOTE: images rendering with "public" as root.
-    const bossIconsRenderDir = './assets/boss-icons'
+    const path = require('path')
+    const bossIconsDir = 'assets/boss-icons'
+    const bossIconsScanDir = path.format({ root: './public/', base: bossIconsDir })
 
     async function initializeBosses() {
       const fs = require('fs')
-      const path = require('path')
       let fileNames: Array<string>
       try {
-        fileNames = await fs.promises.readdir(bossIconsDir)
+        fileNames = await fs.promises.readdir(bossIconsScanDir)
       } catch (err) {
         return
       }
@@ -164,7 +162,7 @@ function App() {
           bossesInitialState[bossName] = boss
         }
 
-        const fullIconPath = path.join(bossIconsRenderDir, fileName)
+        const fullIconPath = path.join(bossIconsDir, fileName)
 
         // NOTE: I'm sure it's defined.
         bossesInitialState[bossName]!.iconPaths.push(fullIconPath)
@@ -418,7 +416,16 @@ function App() {
           useIconVariants = true
         }
 
-        const imgPath = boss.iconPaths[boss.currentIconVariant]
+        const { app } = require('@electron/remote')
+        const path = require('path')
+        let imgPath = boss.iconPaths[boss.currentIconVariant]
+        if (app.isPackaged) {
+          // escaping from 'resources/app.asar'
+          imgPath = path.format({ root: '../../../public/', base: imgPath })
+        } else {
+          imgPath = path.format({ root: './', base: imgPath })
+        }
+
         const iconClassNames = ['boss-icon-img']
         if (!boss.defeated) {
           iconClassNames.push('boss-undefeated')

@@ -2,7 +2,6 @@ const electron = require('electron')
 const { app, BrowserWindow } = electron
 
 const path = require('path')
-const isDev = require('electron-is-dev')
 
 const windowStateKeeper = require('electron-window-state')
 
@@ -28,8 +27,8 @@ function createWindow() {
   })
   mainWindowState.manage(mainWindow)
   // mainWindow.removeMenu()
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`)
-  if (isDev) {
+  mainWindow.loadURL(!app.isPackaged ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`)
+  if (!app.isPackaged) {
     // Open the DevTools.
     // BrowserWindow.addDevToolsExtension('<location to your react chrome extension>')
     mainWindow.webContents.openDevTools()
