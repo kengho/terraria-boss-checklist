@@ -95,7 +95,6 @@ function App() {
   }, [])
 
   useEffect(() => {
-    // TODO: move layouts to assets?
     const bossIconsDir = './public/assets/boss-icons'
 
     // NOTE: images rendering with "public" as root.
@@ -147,6 +146,7 @@ function App() {
         }
       })
 
+      // restore icon variants upon load
       const storedIconVariants: { [key: string]: number } = store.get('iconVariants')
       if (storedIconVariants) {
         Object.keys(storedIconVariants).forEach(bossName => {
