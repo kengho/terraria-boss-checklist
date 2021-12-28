@@ -392,9 +392,9 @@ function App() {
       }
       <div id="settings-hook-file-path">
         <span>autosplitter hook file:</span>
-        <label>
+        <label title={autosplitterHookFilePath ? autosplitterHookFilePath : 'file not selected'}>
           <input type="file" onChange={handleChangeHookFilePath} />
-          select file
+          {autosplitterHookFilePath ? '✔ file selected' : 'select file'}
         </label>
       </div>
     </div>
