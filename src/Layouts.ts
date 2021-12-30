@@ -1,31 +1,49 @@
-type LayoutType = 'hexV' | 'hexH' | 'square'
-type BossProps = {
+type LayoutTypeWithIndices = 'hexV' | 'hexH' | 'square'
+type LayoutTypeWithCoordinates = 'cartesian'
+
+// example from here:
+//   https://stackoverflow.com/a/37688375
+interface BossPropsBasics {
   bossName: string;
+}
+interface BossPropsWithIndices extends BossPropsBasics {
+  x: never;
+  y: never;
   i: number;
   j: number;
 }
-type Layout = {
-  alias: string;
-  type: LayoutType;
-  scale?: number;
-  gridUnitSize?: number;
-  bosses: Array<BossProps>;
-}
-type Layouts = {
-  [key: string]: Layout;
-}
-
-type Coordinates = {
+interface BossPropsWithCoordinates extends BossPropsBasics {
   x: number;
   y: number;
+  i: never;
+  j: never;
+}
+type BossProps = BossPropsWithIndices | BossPropsWithCoordinates
+
+interface LayoutBasics {
+  alias: string;
+  scale?: number;
+  gridUnitSize?: number;
+}
+interface LayoutWithIndices extends LayoutBasics {
+  type: LayoutTypeWithIndices;
+  bosses: Array<BossPropsWithIndices>;
+}
+interface LayoutWithCoordinates extends LayoutBasics {
+  type: LayoutTypeWithCoordinates;
+  bosses: Array<BossPropsWithCoordinates>;
+}
+type Layout = LayoutWithIndices | LayoutWithCoordinates
+type Layouts = {
+  [key: string]: Layout;
 }
 
 const getGridCoordinates = (
   // https://github.com/microsoft/TypeScript/issues/29526
   { layoutType, i, j, gridUnitSize }:
-  { layoutType: LayoutType, i: number, j: number, gridUnitSize: number }
-): Coordinates => {
-  let coordinates: Coordinates = { x: 0, y: 0 }
+  { layoutType: LayoutTypeWithIndices, i: number, j: number, gridUnitSize: number }
+): { x: number, y: number } => {
+  let coordinates: { x: number, y: number } = { x: 0, y: 0 }
   switch (layoutType) {
     // hexV grid indices:
     // y\x    0   1   2

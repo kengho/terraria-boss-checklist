@@ -1,0 +1,57 @@
+alias: circle
+type: cartesian # YEP cartesian circle
+scale: 1.5
+
+# generted using circle.js code sample
+bosses:
+- bossName: ks
+  x: 130
+  y: 20
+- bossName: eoc
+  x: 170
+  y: 27
+- bossName: evil
+  x: 204
+  y: 49
+- bossName: qb
+  x: 228
+  y: 81
+- bossName: skeletron
+  x: 240
+  y: 120
+- bossName: dc
+  x: 236
+  y: 160
+- bossName: wof
+  x: 218
+  y: 196
+- bossName: qs
+  x: 188
+  y: 224
+- bossName: destroyer
+  x: 150
+  y: 238
+- bossName: twins
+  x: 110
+  y: 238
+- bossName: prime
+  x: 72
+  y: 224
+- bossName: fishron
+  x: 42
+  y: 196
+- bossName: plantera
+  x: 24
+  y: 160
+- bossName: eol
+  x: 20
+  y: 120
+- bossName: golem
+  x: 32
+  y: 81
+- bossName: cultist
+  x: 56
+  y: 49
+- bossName: ml
+  x: 90
+  y: 27

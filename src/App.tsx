@@ -206,13 +206,21 @@ function App() {
       return
     }
 
-    layouts[currentLayoutId].bosses.forEach((bossProps: BossProps) => {
-      const { x, y } = getGridCoordinates({
-        layoutType: layouts[currentLayoutId].type,
-        i: bossProps.i,
-        j: bossProps.j,
-        gridUnitSize,
-      })
+    layout.bosses.forEach((bossProps: BossProps) => {
+      let x, y
+      const layoutType = layout.type
+
+      // NOTE: if you swap this other way around ts won't compile despite this being the same code, funny.
+      if (layoutType !== 'cartesian') {
+        ({ x, y } = getGridCoordinates({
+          layoutType,
+          i: bossProps.i,
+          j: bossProps.j,
+          gridUnitSize,
+        }))
+      } else {
+        [x, y] = [bossProps.x, bossProps.y]
+      }
       if (x < tmpX) {
         tmpX = x
       }
@@ -361,10 +369,12 @@ function App() {
         <input type="range" min="30" max="50" step="1"
           value={gridUnitSize}
           onChange={handleChangeGridUnitSize}
+          disabled={currentLayout && currentLayout.type === 'cartesian'}
         />
         <input type="number" min="0"
           value={gridUnitSize}
           onChange={handleChangeGridUnitSize}
+          disabled={currentLayout && currentLayout.type === 'cartesian'}
         />
       </div>
       <div id="settings-bgcolor">
@@ -434,12 +444,18 @@ function App() {
           iconClassNames.push('pointer')
         }
 
-        const { x, y } = getGridCoordinates({
-          layoutType: currentLayout.type,
-          i: bossProps.i,
-          j: bossProps.j,
-          gridUnitSize,
-        })
+        let x, y
+        const layoutType = currentLayout.type
+        if (layoutType !== 'cartesian') {
+          ({ x, y } = getGridCoordinates({
+            layoutType,
+            i: bossProps.i,
+            j: bossProps.j,
+            gridUnitSize,
+          }))
+        } else {
+          [x, y] = [bossProps.x, bossProps.y]
+        }
         return <div
           key={`${bossProps.bossName}-wrapper`}
           className="boss-icon-wrapper"
