@@ -6,7 +6,7 @@ import './App.css'
 import { BossProps, Layout, Layouts, getGridCoordinates } from './Layouts'
 import { Boss, Bosses } from './Bosses'
 import initAutosplitterHook from './AutosplitterHook'
-import { version, description } from './../package.json'
+import { version } from './../package.json'
 
 // 'electron-store' bugs out for me, and it's a general overkill for this app
 import Store from './simpleStore'
@@ -193,8 +193,6 @@ function App() {
   useEffect(() => {
     initAutosplitterHook(autosplitterHookFilePath, setBosses)
   }, [autosplitterHookFilePath])
-
-  useEffect(() => { document.title = `${description} ${version}` }, [])
 
   useEffect(() => { document.body.style.backgroundColor = keyColorHex }, [keyColorHex])
 
@@ -477,6 +475,7 @@ function App() {
         </div>
       })}
     </div>
+    <div style={{position: 'absolute', bottom: '20px', right: '20px', color: 'gray'}}>v{version}</div>
   </div>
 }
 

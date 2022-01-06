@@ -25,7 +25,7 @@ span {
   margin: 20px;
 }
 
-#checklist > div {
+#checklist > div:not(:last-child) {
   margin-bottom: 16px;
 }
 
