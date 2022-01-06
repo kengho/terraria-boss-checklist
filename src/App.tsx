@@ -19,6 +19,7 @@ function App() {
   const [bosses, setBosses] = useState<Bosses>()
   const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(store.get('showOnlyBossIcons') || false)
   const [aphb, setAphb] = useState<boolean>(store.get('aphb') || false)
+  const [ab, setAb] = useState<boolean>(store.get('ab') || false)
   const defaultScale = 1.5
   const layoutsOverrideForScale = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.scale
   const [scale, setScale] = useState<number>(layoutsOverrideForScale || defaultScale)
@@ -49,13 +50,13 @@ function App() {
       store.set('iconVariants', iconVariants)
     }
 
-    // TODO: aphb hardcoded into layouts for now, fix.
     store.set('aphb', aphb)
+    store.set('ab', ab)
     store.set('showOnlyBossIcons', showOnlyBossIcons)
     store.set('keyColorHex', keyColorHex)
     store.set('currentLayoutId', currentLayoutId)
     store.set('autosplitterHookFilePath', autosplitterHookFilePath)
-  }, [bosses, aphb, showOnlyBossIcons, keyColorHex, currentLayoutId, autosplitterHookFilePath])
+  }, [bosses, aphb, ab, showOnlyBossIcons, keyColorHex, currentLayoutId, autosplitterHookFilePath])
 
   // saving scale and gridUnitSize separate from other props because otherwise
   //   changing currentLayoutId triggers saving wrong data to the store
@@ -156,6 +157,7 @@ function App() {
           const boss: Boss = {
             defeated: false,
             hardmodeExclusive: true,
+            requiredForMl: false,
             currentIconVariant: 0,
             iconPaths: [],
           }
@@ -173,6 +175,16 @@ function App() {
       aphbList.forEach(bossName => {
         if (bossesInitialState[bossName]) {
           bossesInitialState[bossName].hardmodeExclusive = false
+        }
+      })
+
+      const abList: Array<string> = [
+        'wof', 'destroyer', 'twins', 'prime', 'skeletron',
+        'plantera', 'golem', 'cultist', 'ml'
+      ]
+      abList.forEach(bossName => {
+        if (bossesInitialState[bossName]) {
+          bossesInitialState[bossName].requiredForMl = true
         }
       })
 
@@ -257,6 +269,10 @@ function App() {
 
   const handleAphbClick = (): void => {
     setAphb(!aphb)
+  }
+
+  const handleAbClick = (): void => {
+    setAb(!ab)
   }
 
   const handleChangeScale = (evt: React.SyntheticEvent<EventTarget>): void => {
@@ -351,6 +367,17 @@ function App() {
           onChange={handleAphbClick}
         />
       </div>
+      <div>
+        <label htmlFor="settings-ab-checkbox" className="pointer">
+          <span>show only bosses required for Moon Lord:</span>
+        </label>
+        <input
+          id="settings-ab-checkbox"
+          type="checkbox"
+          defaultChecked={!ab}
+          onChange={handleAbClick}
+        />
+      </div>
       <div id="settings-scale">
         <span>scale:</span>
         <input type="range" min="0.5" max="4" step="0.1"
@@ -415,7 +442,11 @@ function App() {
     >
       {currentLayout && currentLayout.bosses && currentLayout.bosses.map((bossProps: BossProps) => {
         const boss = bosses![bossProps.bossName]
-        if (aphb && boss.hardmodeExclusive) {
+        if (typeof aphb === 'boolean' && aphb && boss.hardmodeExclusive) {
+          return false
+        }
+
+        if (typeof ab === 'boolean' && !ab && !boss.requiredForMl) {
           return false
         }
 

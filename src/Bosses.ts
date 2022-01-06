@@ -1,6 +1,7 @@
 type Boss = {
   defeated: boolean;
   hardmodeExclusive: boolean;
+  requiredForMl: boolean;
   iconPaths: Array<string>;
   currentIconVariant: number;
 }
