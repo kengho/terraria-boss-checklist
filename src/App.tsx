@@ -19,7 +19,7 @@ function App() {
   const [bosses, setBosses] = useState<Bosses>()
   const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(store.get('showOnlyBossIcons') || false)
   const [aphb, setAphb] = useState<boolean>(store.get('aphb') || false)
-  const [ab, setAb] = useState<boolean>(store.get('ab') || false)
+  const [ab, setAb] = useState<boolean>(store.get('ab') || true)
   const defaultScale = 1.5
   const layoutsOverrideForScale = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.scale
   const [scale, setScale] = useState<number>(layoutsOverrideForScale || defaultScale)
