@@ -346,7 +346,21 @@ function App() {
         const { getCurrentWindow } = require('@electron/remote')
         getCurrentWindow().reload()
       }}>
-        reset settings and reload app
+        reset settings
+      </button>
+      <button onClick={() => {
+        const { shell, app } = require('@electron/remote')
+        if (app.isPackaged) {
+          // https://stackoverflow.com/a/64149465
+          const path = require('path')
+          const exeDirPath = path.dirname(app.getPath('exe'))
+          shell.openPath(exeDirPath)
+        } else {
+          // https://stackoverflow.com/a/37215237
+          shell.openPath(app.getAppPath())
+        }
+      }}>
+        open app folder
       </button>
     </div>
     <div id="tips" style={{ display: showOnlyBossIcons ? 'none' : 'block' }}>
