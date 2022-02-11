@@ -1,8 +1,14 @@
+type iconPaths = {
+  regular: string,
+  animated: string,
+  animationDuration: number,
+}
+
 type Boss = {
   defeated: boolean;
   hardmodeExclusive: boolean;
   requiredForMl: boolean;
-  iconPaths: Array<string>;
+  iconPaths: Array<iconPaths>;
   currentIconVariant: number;
 }
 

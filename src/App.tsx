@@ -5,6 +5,7 @@ import YAML from 'yaml'
 import './App.css'
 import { BossProps, Layout, Layouts, getGridCoordinates } from './Layouts'
 import { Boss, Bosses } from './Bosses'
+import BossIcon from './BossIcon'
 import initAutosplitterHook from './AutosplitterHook'
 import { version } from './../package.json'
 
@@ -29,6 +30,8 @@ function App() {
   const defaultGridUnitSize = 40
   const layoutsOverrideForGridUnitSize = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.gridUnitSize
   const [gridUnitSize, setGridUnitSize] = useState<number>(layoutsOverrideForGridUnitSize || defaultGridUnitSize)
+  const defaultAnimationsCooldown = 0
+  const [animationsCooldown, setAnimationsCooldown] = useState<number>(store.get('animationsCooldown') || defaultAnimationsCooldown)
   const [autosplitterHookFilePath, setAutosplitterHookFilePath] = useState<string>(store.get('autosplitterHookFilePath') || '')
   const [layouts, setLayouts] = useState<Layouts>({})
 
@@ -53,10 +56,11 @@ function App() {
     store.set('aphb', aphb)
     store.set('ab', ab)
     store.set('showOnlyBossIcons', showOnlyBossIcons)
+    store.set('animationsCooldown', animationsCooldown)
     store.set('keyColorHex', keyColorHex)
     store.set('currentLayoutId', currentLayoutId)
     store.set('autosplitterHookFilePath', autosplitterHookFilePath)
-  }, [bosses, aphb, ab, showOnlyBossIcons, keyColorHex, currentLayoutId, autosplitterHookFilePath])
+  }, [bosses, aphb, ab, showOnlyBossIcons, animationsCooldown, keyColorHex, currentLayoutId, autosplitterHookFilePath])
 
   // saving scale and gridUnitSize separate from other props because otherwise
   //   changing currentLayoutId triggers saving wrong data to the store
@@ -144,30 +148,56 @@ function App() {
         return
       }
 
-      let bossesInitialState: any = {}
+      let parsedIconsData: any = {}
       fileNames.forEach(fileName => {
         const fileNameNoExt: string = path.parse(fileName).name
-        const match = fileNameNoExt.match(/^([^-]+)(-v.*)?$/)
+        const match = fileNameNoExt.match(/^([^-]+)(-v([^-]+))?(-a)?(\d+)?$/)
         if (!match) {
           return
         }
 
         const bossName = match[1]
-        if (!bossesInitialState[bossName]) {
-          const boss: Boss = {
-            defeated: false,
-            hardmodeExclusive: true,
-            requiredForMl: false,
-            currentIconVariant: 0,
-            iconPaths: [],
-          }
-          bossesInitialState[bossName] = boss
+        const bossIconVariant = match[3] || 'default'
+        const bossIconAnimated = (match[4] === '-a')
+        const bossIconAnimationDuration = parseInt(match[5])
+
+        if (!parsedIconsData[bossName]) {
+          parsedIconsData[bossName] = {}
+        }
+
+        if (!parsedIconsData[bossName][bossIconVariant]) {
+          parsedIconsData[bossName][bossIconVariant] = {}
         }
 
         const fullIconPath = path.join(bossIconsDir, fileName)
+        if (bossIconAnimated) {
+          parsedIconsData[bossName][bossIconVariant].animatedPath = fullIconPath
+          parsedIconsData[bossName][bossIconVariant].bossIconAnimationDuration = bossIconAnimationDuration
+        } else {
+          parsedIconsData[bossName][bossIconVariant].regularPath = fullIconPath
+        }
+      })
 
-        // NOTE: I'm sure it's defined.
-        bossesInitialState[bossName]!.iconPaths.push(fullIconPath)
+      let bossesInitialState: any = {}
+      Object.keys(parsedIconsData).forEach(bossName => {
+        const boss: Boss = {
+          defeated: false,
+          hardmodeExclusive: true,
+          requiredForMl: false,
+          currentIconVariant: 0,
+          iconPaths: [],
+        }
+
+        Object.keys(parsedIconsData[bossName]).forEach(iconVariant => {
+          const paths = {
+            regular: parsedIconsData[bossName][iconVariant].regularPath,
+            animated : parsedIconsData[bossName][iconVariant].animatedPath,
+            animationDuration: parsedIconsData[bossName][iconVariant].bossIconAnimationDuration,
+          }
+          boss.iconPaths.push(paths)
+        })
+
+        bossesInitialState[bossName] = boss
       })
 
       // TODO: let users est aphb flag somewhere somehow. Hardcoded phb for now.
@@ -295,6 +325,18 @@ function App() {
     }
   }
 
+  // REVIEW: it might be the time to make a general function for this handler's type,
+  //   this pattern used 3 times already.
+  const handleChangeAnimationsCooldown = (evt: React.SyntheticEvent<EventTarget>): void => {
+    const elem = evt.target as HTMLInputElement
+    let nextAnimationsCooldown = parseFloat(elem.value)
+    if (isNaN(nextAnimationsCooldown)) {
+      setAnimationsCooldown(defaultAnimationsCooldown)
+    } else {
+      setAnimationsCooldown(nextAnimationsCooldown)
+    }
+  }
+
   const handleChangeKeyColorHex = (evt: React.SyntheticEvent<EventTarget>): void => {
     const elem = evt.target as HTMLInputElement
     setKeyColorHex(elem.value)
@@ -416,6 +458,17 @@ function App() {
           disabled={currentLayout && currentLayout.type === 'cartesian'}
         />
       </div>
+      <div id="settings-animation-cd">
+        <span>animations cooldown<br />(in minutes, 0 = none):</span>
+        <input type="range" min="0" max="60" step="5"
+          value={animationsCooldown}
+          onChange={handleChangeAnimationsCooldown}
+        />
+        <input type="number" step="1" min="0"
+          value={animationsCooldown}
+          onChange={handleChangeAnimationsCooldown}
+        />
+      </div>
       <div id="settings-bgcolor">
         <span>key color:</span>
         <input type="text" pattern="[#0-9a-f]+"
@@ -469,55 +522,20 @@ function App() {
           useIconVariants = true
         }
 
-        const { app } = require('@electron/remote')
-        const path = require('path')
-        let imgPath = boss.iconPaths[boss.currentIconVariant]
-        if (app.isPackaged) {
-          // escaping from 'resources/app.asar'
-          imgPath = path.format({ root: '../../../public/', base: imgPath })
-        } else {
-          imgPath = path.format({ root: './', base: imgPath })
-        }
-
-        const iconClassNames = ['boss-icon-img']
-        if (!boss.defeated) {
-          iconClassNames.push('boss-undefeated')
-        }
-        if (useIconVariants) {
-          iconClassNames.push('pointer')
-        }
-
-        let x, y
-        const layoutType = currentLayout.type
-        if (layoutType !== 'cartesian') {
-          ({ x, y } = getGridCoordinates({
-            layoutType,
-            i: bossProps.i,
-            j: bossProps.j,
-            gridUnitSize,
-          }))
-        } else {
-          [x, y] = [bossProps.x, bossProps.y]
-        }
-        return <div
+        return <BossIcon
           key={`${bossProps.bossName}-wrapper`}
-          className="boss-icon-wrapper"
-          style={{
-            width: gridUnitSize,
-            height: gridUnitSize,
-            left: x - gridUnitSize / 2,
-            top: y - gridUnitSize / 2,
-          }}
-        >
-          <img
-            key={`${bossProps.bossName}-img`}
-            alt={bossProps.bossName}
-            className={iconClassNames.join(' ')}
-            src={imgPath}
-            onClick={() => handleBossIconLeftClick(bossProps.bossName)}
-            onContextMenu={/* change if not electron */ () => handleBossIconRightClick(bossProps.bossName)}
-          />
-        </div>
+          bossProps={bossProps}
+          regularPath={boss.iconPaths[boss.currentIconVariant].regular}
+          animatedPath={boss.iconPaths[boss.currentIconVariant].animated}
+          animationDuration={boss.iconPaths[boss.currentIconVariant].animationDuration}
+          defeated={boss.defeated}
+          useIconVariants={useIconVariants}
+          layoutType={currentLayout.type}
+          gridUnitSize={gridUnitSize}
+          animationsCooldown={animationsCooldown}
+          leftClickHandler={handleBossIconLeftClick}
+          rightClickHandler={handleBossIconRightClick}
+        />
       })}
     </div>
     <div style={{position: 'absolute', bottom: '20px', right: '20px', color: 'gray'}}>v{version}</div>

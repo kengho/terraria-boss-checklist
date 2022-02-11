@@ -53,13 +53,14 @@ span {
 }
 
 #settings {
-  width: 400px;
+  width: 420px;
   display: flex;
   flex-direction: column;
 }
 
 #settings span {
   white-space: nowrap;
+  /* min-width: 180px; */
 }
 
 #settings > div {
@@ -97,8 +98,7 @@ span {
   width: 100%;
 }
 
-#settings-scale input[type=number],
-#settings-grid-unit-size input[type=number] {
+input[type=number] {
   max-width: 5em;
 }
 

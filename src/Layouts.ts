@@ -1,5 +1,6 @@
 type LayoutTypeWithIndices = 'hexV' | 'hexH' | 'square'
 type LayoutTypeWithCoordinates = 'cartesian'
+type LayoutType = LayoutTypeWithIndices | LayoutTypeWithCoordinates
 
 // example from here:
 //   https://stackoverflow.com/a/37688375
@@ -93,4 +94,4 @@ const getGridCoordinates = (
   return coordinates
 }
 
-export { type BossProps, type Layout, type Layouts, getGridCoordinates }
+export { type BossProps, type LayoutType, type Layout, type Layouts, getGridCoordinates }
