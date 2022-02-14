@@ -14,25 +14,39 @@ import Store from './simpleStore'
 const store = new Store('uiState.json')
 
 function App() {
+  // correctly works with bool props and zeroes
+  const getProp = (store: Store, propName: any, defaultProp: any) => {
+    const storeProp = store.get(propName)
+    if (typeof storeProp === 'undefined') {
+      return defaultProp
+    } else {
+      return storeProp
+    }
+  }
+
   // state
   const defaultCurrentLayoutId = 'hexV'
-  const [currentLayoutId, setCurrentLayoutId] = useState<string>(store.get('currentLayoutId') || defaultCurrentLayoutId)
+  const [currentLayoutId, setCurrentLayoutId] = useState<string>(getProp(store, 'currentLayoutId', defaultCurrentLayoutId))
   const [bosses, setBosses] = useState<Bosses>()
-  const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(store.get('showOnlyBossIcons') || false)
-  const [aphb, setAphb] = useState<boolean>(store.get('aphb') || false)
-  const [ab, setAb] = useState<boolean>(store.get('ab') || true)
+  const [showOnlyBossIcons, setShowOnlyBossIcons] = useState<boolean>(getProp(store, 'showOnlyBossIcons', false))
+  const [aphb, setAphb] = useState<boolean>(getProp(store, 'aphb', false))
+  const [ab, setAb] = useState<boolean>(getProp(store, 'ab', true))
+
   const defaultScale = 1.5
   const layoutsOverrideForScale = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.scale
   const [scale, setScale] = useState<number>(layoutsOverrideForScale || defaultScale)
-  const [keyColorHex, setKeyColorHex] = useState<string>(store.get('keyColorHex') || '#222222')
+
+  const [keyColorHex, setKeyColorHex] = useState<string>(getProp(store, 'keyColorHex', '#222222'))
   const [gridMinX, setGridMinX] = useState<number>(0)
   const [gridMinY, setGridMinY] = useState<number>(0)
+
   const defaultGridUnitSize = 40
   const layoutsOverrideForGridUnitSize = store.get('layoutsOverrides') && store.get('layoutsOverrides')[currentLayoutId]?.gridUnitSize
   const [gridUnitSize, setGridUnitSize] = useState<number>(layoutsOverrideForGridUnitSize || defaultGridUnitSize)
+
   const defaultAnimationsCooldown = 0
-  const [animationsCooldown, setAnimationsCooldown] = useState<number>(store.get('animationsCooldown') || defaultAnimationsCooldown)
-  const [autosplitterHookFilePath, setAutosplitterHookFilePath] = useState<string>(store.get('autosplitterHookFilePath') || '')
+  const [animationsCooldown, setAnimationsCooldown] = useState<number>(getProp(store, 'animationsCooldown', defaultAnimationsCooldown))
+  const [autosplitterHookFilePath, setAutosplitterHookFilePath] = useState<string>(getProp(store, 'autosplitterHookFilePath', ''))
   const [layouts, setLayouts] = useState<Layouts>({})
 
   // side effects
