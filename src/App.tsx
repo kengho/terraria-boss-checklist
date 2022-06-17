@@ -472,7 +472,7 @@ function App() {
           disabled={currentLayout && currentLayout.type === 'cartesian'}
         />
       </div>
-      <div id="settings-animation-cd">
+      {false && <div id="settings-animation-cd">
         <span>animations cooldown<br />(in minutes, 0 = none):</span>
         <input type="range" min="0" max="60" step="5"
           value={animationsCooldown}
@@ -482,7 +482,7 @@ function App() {
           value={animationsCooldown}
           onChange={handleChangeAnimationsCooldown}
         />
-      </div>
+      </div>}
       <div id="settings-bgcolor">
         <span>key color:</span>
         <input type="text" pattern="[#0-9a-f]+"
