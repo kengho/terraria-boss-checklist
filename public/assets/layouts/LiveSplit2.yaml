@@ -1,0 +1,32 @@
+alias: LiveSplit ML w/ pillars
+type: square
+scale: 1
+gridUnitSize: 35
+bosses:
+- bossName: wof
+  i: 0
+  j: 6
+- bossName: destroyer
+  i: 0
+  j: 7
+- bossName: twins
+  i: 1
+  j: 7
+- bossName: prime
+  i: 2
+  j: 7
+- bossName: plantera
+  i: 0
+  j: 8
+- bossName: golem
+  i: 0
+  j: 9
+- bossName: cultist
+  i: 0
+  j: 10
+- bossName: pillars
+  i: 0
+  j: 11
+- bossName: ml
+  i: 0
+  j: 12

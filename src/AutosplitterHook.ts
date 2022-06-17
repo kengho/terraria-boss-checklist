@@ -20,6 +20,7 @@ const bossNamesMapping: { [key: string]: string } = {
   'TheTwins': 'twins',
   'SkeletronPrime': 'prime',
   'Deerclops': 'dc',
+  'NebulaPillar': 'pillars',
 }
 
 const readDataAndUpdateState = (autosplitterHookFilePath: string, setBosses: Function): void  => {
@@ -52,6 +53,7 @@ const readDataAndUpdateState = (autosplitterHookFilePath: string, setBosses: Fun
     // TheTwins,False
     // SkeletronPrime,True
     // Deerclops,True
+    // NebulaPillar,True
     //
 
     setBosses(produce((draft: Bosses) => {

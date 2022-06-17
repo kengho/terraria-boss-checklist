@@ -224,7 +224,7 @@ function App() {
 
       const abList: Array<string> = [
         'wof', 'destroyer', 'twins', 'prime', 'skeletron',
-        'plantera', 'golem', 'cultist', 'ml'
+        'plantera', 'golem', 'cultist', 'pillars', 'ml'
       ]
       abList.forEach(bossName => {
         if (bossesInitialState[bossName]) {
