@@ -10,7 +10,7 @@ Electron-wrapped web app similar to [terraria-boss-checklist by DrYoshiyahu](htt
 2. Added build-in `scale` settings for the ones who capture their whole screen or who doesn't know how to scale pixel art in OBS
 3. Added `grid unit size` (useful for linear layouts) and `key color` settings
 4. Some icons (namely Cultist and EoC) were modified to fit the grid better
-5. The icons are better placed in terms of the way people speedrun the game: pre-hardmode bosses are clustered together, obligatory bosses and optional bosses too. Slime royal family is back together (this is the most important feature by far)
+5. The icons are better placed in terms of the way people speedrun the game: pre-hardmode bosses are clustered together, obligatory bosses and optional bosses too. Slime royal family is back together (this is the most important feature so far)
 6. Customizable boss layouts and icons
 
 ## Usage
